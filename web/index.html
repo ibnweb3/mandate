@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mandate: owner console</title>
+  <meta name="description" content="Write a payout rule once in plain words. Lightning pays everyone, and the wallet itself refuses to overspend.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap top-row">
+      <a class="brand" href="/" aria-label="Mandate home"><svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="currentColor"/><path d="M9 22V10l7 8 7-8v12" fill="none" stroke="var(--bg)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Mandate</span></a>
+      <span class="net" title="Everything here uses signet test sats, not real money">Signet · test sats</span>
+      <dl class="stats" aria-live="polite">
+        <div><dt>Wallet</dt><dd id="st-balance">…</dd></div>
+        <div><dt>Payer budget</dt><dd id="st-budget">…</dd></div>
+      </dl>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <h1>Write the payout rule once. Lightning pays everyone.</h1>
+      <p>The rule is plain words. AI only reads it and proposes. You confirm. After that, plain code splits every sale, and the wallet itself refuses to pay out more than its budget.</p>
+    </section>
+
+    <section class="card" id="step-rule" aria-labelledby="h-rule">
+      <h2 id="h-rule"><span class="n">1</span> Your rule</h2>
+      <div id="rule-active" hidden></div>
+      <form id="rule-form">
+        <div class="field"><label for="rule-name">Name this rule</label><input id="rule-name" type="text" value="Shea co-op payouts" maxlength="80" autocomplete="off"></div>
+        <label for="rule-text">Say how each sale should be shared</label>
+        <textarea id="rule-text" rows="4" spellcheck="false" placeholder="10% of each sale goes to Coop. Split the rest between Amadou, Fatou and Ousmane by kg delivered."></textarea>
+        <p class="hint">Payee names that match a test wallet (<span id="demo-handles">coop, amadou, fatou, ousmane, supplier</span>) are paid there. Real Lightning addresses plug into the same slot.</p>
+        <div class="row"><button class="btn" type="submit" id="btn-read">Read my rule</button><span id="rule-status" class="status" aria-live="polite"></span></div>
+      </form>
+      <div id="proposal" hidden></div>
+    </section>
+
+    <section class="card" id="step-deliveries" aria-labelledby="h-del" hidden>
+      <h2 id="h-del"><span class="n">2</span> Deliveries this period</h2>
+      <form id="del-form">
+        <div class="field"><label for="del-period">Period</label><input id="del-period" type="text" value="Week 1" maxlength="40" autocomplete="off"></div>
+        <div id="del-rows" class="del-rows"></div>
+        <div class="row"><button class="btn" type="submit">Save deliveries</button><span id="del-status" class="status" aria-live="polite"></span></div>
+      </form>
+    </section>
+
+    <section class="card" id="step-sale" aria-labelledby="h-sale" hidden>
+      <h2 id="h-sale"><span class="n">3</span> A sale comes in</h2>
+      <form id="sale-form">
+        <div class="grid2">
+          <div class="field"><label for="sale-sats">Amount (sats)</label><input id="sale-sats" type="number" inputmode="numeric" min="1" max="1000000" value="1000" step="1"></div>
+          <div class="field"><label for="sale-note">What was sold</label><input id="sale-note" type="text" value="Shea butter, 40 jars" maxlength="80" autocomplete="off"></div>
+        </div>
+        <div class="row"><button class="btn" type="submit">Create the buyer's invoice</button><span id="sale-status" class="status" aria-live="polite"></span></div>
+      </form>
+      <div id="open-invoices"></div>
+    </section>
+
+    <section class="card" id="step-sales" aria-labelledby="h-sales">
+      <h2 id="h-sales">Sales and payouts</h2>
+      <div id="sales"><p class="empty">No sales yet. Create an invoice above, then pay it.</p></div>
+    </section>
+  </main>
+
+  <footer class="wrap foot">
+    <p>Every step is signed and published to Nostr. <a href="/proof/" target="_blank" rel="noopener">Open the public proof page</a>, which needs no wallet and no login. Log signed by <code id="pubkey">…</code>. <span id="log-count"></span></p>
+  </footer>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

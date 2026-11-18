@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mandate proof: check every payout yourself</title>
+  <meta name="description" content="A public, no-wallet page that re-checks every payout a Mandate rule made: signatures, hash chain, arithmetic and Lightning proofs of payment.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="proof.css">
+</head>
+<body>
+  <header class="top"><div class="wrap top-row">
+    <a class="brand" href="./" aria-label="Mandate proof home"><svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="currentColor"/><path d="M9 22V10l7 8 7-8v12" fill="none" stroke="var(--bg)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Mandate</span></a>
+    <span class="net">Signet · test sats</span>
+  </div></header>
+
+  <main class="wrap">
+    <section class="hero">
+      <h1>Don't trust us. Check it.</h1>
+      <p>This page needs no wallet and no login. It downloads the signed log, then re-checks every signature, every link in the chain, every split calculation and every Lightning proof of payment, right here in your browser.</p>
+    </section>
+
+    <section class="card" aria-labelledby="h-sum">
+      <h2 id="h-sum">Overall result</h2>
+      <div id="summary" aria-live="polite"><p class="empty">Loading the log…</p></div>
+      <div id="sources" class="meta"></div>
+    </section>
+
+    <section aria-labelledby="h-sales">
+      <h2 id="h-sales" class="plain">Sales</h2>
+      <div id="sales"></div>
+    </section>
+
+    <section class="card" aria-labelledby="h-cheat">
+      <h2 id="h-cheat">Try to cheat</h2>
+      <p class="meta">Pretend you are a dishonest operator. This changes one payout amount in your own copy of the log, then runs the same check again. Nothing leaves your browser.</p>
+      <div class="row"><button class="btn" id="btn-cheat" type="button">Alter one payout and re-check</button><button class="btn ghost" id="btn-reset" type="button" hidden>Restore the real log</button></div>
+      <div id="cheat-out" aria-live="polite"></div>
+    </section>
+
+    <section class="card" aria-labelledby="h-log">
+      <h2 id="h-log">The signed log</h2>
+      <p class="meta">Each entry contains the hash of the one before it, and is signed with the key below. Changing or removing any entry breaks the chain.</p>
+      <div id="log"></div>
+    </section>
+  </main>
+  <footer class="wrap foot"><p>Signing key <code id="pubkey">…</code>. Verifier code: <a href="lib/verify.mjs">verify.mjs</a> and <a href="lib/rule.mjs">rule.mjs</a>, the same files the engine uses.</p></footer>
+  <script type="module" src="proof.js"></script>
+</body>
+</html>

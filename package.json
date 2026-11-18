@@ -1,0 +1,27 @@
+{
+  "name": "mandate",
+  "version": "1.0.0",
+  "description": "Plain-words payout rules that Lightning executes, with a wallet-enforced spending cap and a public proof page.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/server.mjs",
+    "dev": "node src/server.mjs --no-publish",
+    "test": "node --test \"test/*.test.mjs\"",
+    "setup": "node scripts/setup-wallets.mjs",
+    "gate1": "node gates/gate1-connect.mjs",
+    "gate2": "node gates/gate2-receive.mjs",
+    "gate3": "node gates/gate3-pay-address.mjs",
+    "gate4": "node gates/gate4-budget-cap.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "@getalby/lightning-tools": "^10.0.0",
+    "@getalby/sdk": "^9.0.0",
+    "@noble/hashes": "^2.4.0",
+    "dotenv": "^18.0.10",
+    "nostr-tools": "^2.26.1"
+  }
+}

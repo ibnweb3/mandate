@@ -1,0 +1,7 @@
+.env
+node_modules/
+*.log
+.tmp_*
+data/
+.codex-pass.md
+public/proof-data.json

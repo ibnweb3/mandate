@@ -8,47 +8,73 @@
   <meta name="color-scheme" content="dark">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Silkscreen:wght@400;700&display=swap">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="shell/desktop.css">
   <link rel="stylesheet" href="proof.css">
 </head>
 <body>
-  <header class="top"><div class="wrap top-row">
-    <a class="brand" href="./" aria-label="Mandate proof home"><svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="currentColor"/><path d="M9 22V10l7 8 7-8v12" fill="none" stroke="var(--bg)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Mandate</span></a>
-    <span class="net">Signet · test sats</span>
-  </div></header>
+<div class="room"><div class="stage-wrap"><div class="stage">
+  <div class="monitor">
+    <div class="bezel"><div class="screen">
+      <div class="desktop" id="desktop">
+        <nav class="icons" aria-label="Desktop">
+          <button class="icon" type="button" data-open="result"><span data-icon="shield"></span>Result</button>
+          <button class="icon" type="button" data-open="sales"><span data-icon="briefcase"></span>Sales</button>
+          <button class="icon" type="button" data-open="cheat"><span data-icon="document"></span>Cheat</button>
+          <button class="icon" type="button" data-open="log"><span data-icon="journal"></span>Log</button>
+          <button class="icon" type="button" data-open="about"><span data-icon="folder"></span>About</button>
+        </nav>
+        <div class="hero-text">
+          <p>Don't trust us. Check it. No wallet, no login.</p>
+          <h1 class="title">Proof</h1>
+        </div>
+        <p class="hint-line">Open an icon to see a page</p>
 
-  <main class="wrap">
-    <section class="hero">
-      <h1>Don't trust us. Check it.</h1>
-      <p>This page needs no wallet and no login. It downloads the signed log, then re-checks every signature, every link in the chain, every split calculation and every Lightning proof of payment, right here in your browser.</p>
-    </section>
+        <section class="win" id="win-result" data-title="Overall result" data-path="Result" data-x="200" data-y="10" data-w="640" data-h="205" data-default-open>
+          <div id="summary" aria-live="polite"><p class="empty">Loading the log…</p></div>
+          <div id="sources" class="meta"></div>
+        </section>
 
-    <section class="card" aria-labelledby="h-sum">
-      <h2 id="h-sum">Overall result</h2>
-      <div id="summary" aria-live="polite"><p class="empty">Loading the log…</p></div>
-      <div id="sources" class="meta"></div>
-    </section>
+        <section class="win" id="win-sales" data-title="Sales" data-path="Sales" data-x="190" data-y="222" data-w="720" data-h="290" data-default-open>
+          <div id="sales"></div>
+        </section>
 
-    <section aria-labelledby="h-sales">
-      <h2 id="h-sales" class="plain">Sales</h2>
-      <div id="sales"></div>
-    </section>
+        <section class="win" id="win-cheat" data-title="Try to cheat" data-path="Try to cheat" data-x="220" data-y="40" data-w="560" data-h="330">
+          <p class="meta">Pretend you are a dishonest operator. This changes one payout amount in your own copy of the log, then runs the same check again. Nothing leaves your browser.</p>
+          <div class="row"><button class="btn" id="btn-cheat" type="button">Alter one payout and re-check</button><button class="btn ghost" id="btn-reset" type="button" hidden>Restore the real log</button></div>
+          <div id="cheat-out" aria-live="polite"></div>
+        </section>
 
-    <section class="card" aria-labelledby="h-cheat">
-      <h2 id="h-cheat">Try to cheat</h2>
-      <p class="meta">Pretend you are a dishonest operator. This changes one payout amount in your own copy of the log, then runs the same check again. Nothing leaves your browser.</p>
-      <div class="row"><button class="btn" id="btn-cheat" type="button">Alter one payout and re-check</button><button class="btn ghost" id="btn-reset" type="button" hidden>Restore the real log</button></div>
-      <div id="cheat-out" aria-live="polite"></div>
-    </section>
+        <section class="win" id="win-log" data-title="The signed log" data-path="Signed log" data-x="200" data-y="24" data-w="640" data-h="420">
+          <p class="meta">Each entry contains the hash of the one before it, and is signed with the key below. Changing or removing any entry breaks the chain.</p>
+          <div id="log"></div>
+        </section>
 
-    <section class="card" aria-labelledby="h-log">
-      <h2 id="h-log">The signed log</h2>
-      <p class="meta">Each entry contains the hash of the one before it, and is signed with the key below. Changing or removing any entry breaks the chain.</p>
-      <div id="log"></div>
-    </section>
-  </main>
-  <footer class="wrap foot"><p>Signing key <code id="pubkey">…</code>. Verifier code: <a href="lib/verify.mjs">verify.mjs</a> and <a href="lib/rule.mjs">rule.mjs</a>, the same files the engine uses.</p></footer>
-  <script type="module" src="proof.js"></script>
+        <section class="win" id="win-about" data-title="About" data-path="About" data-x="240" data-y="40" data-w="540" data-h="340">
+          <p>This page downloads the signed log, then re-checks every signature, every link in the chain, every split calculation and every Lightning proof of payment, right here in your browser.</p>
+          <p class="meta">Signing key <code id="pubkey">…</code></p>
+          <p class="meta">Verifier code: <a href="lib/verify.mjs">verify.mjs</a> and <a href="lib/rule.mjs">rule.mjs</a>, the same files the engine uses. All sats are signet test sats.</p>
+        </section>
+      </div>
+
+      <div class="taskbar">
+        <div class="quick" aria-label="Quick open">
+          <button type="button" data-open="result" aria-label="Result" title="Result"><span data-icon="shield"></span></button>
+          <button type="button" data-open="sales" aria-label="Sales" title="Sales"><span data-icon="briefcase"></span></button>
+          <button type="button" data-open="cheat" aria-label="Try to cheat" title="Try to cheat"><span data-icon="document"></span></button>
+          <button type="button" data-open="log" aria-label="Signed log" title="Signed log"><span data-icon="journal"></span></button>
+        </div>
+        <div class="tasks" aria-label="Open windows"></div>
+        <div class="sys"><span class="net" title="Everything here uses signet test sats, not real money">Signet test sats</span><span class="clock" id="clock">--:--</span></div>
+      </div>
+      <div class="crt" aria-hidden="true"></div>
+    </div></div>
+    <div class="chin" aria-hidden="true"><span class="badge">Mandate 86</span><span class="vents"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="led"></span><span class="power"></span></div>
+  </div>
+  <div class="base" aria-hidden="true"></div>
+</div></div></div>
+<script type="module" src="shell/desktop.js"></script>
+<script type="module" src="proof.js"></script>
 </body>
 </html>

@@ -99,7 +99,8 @@ const server = createServer(async (req, res) => {
     }
     if (req.method !== 'GET') return json(res, 404, { error: 'not found' });
     const isProof = url.pathname === '/proof' || url.pathname.startsWith('/proof/');
-    const base = isProof ? 'public' : 'web';
+    const isShell = url.pathname.startsWith('/shell/');
+    const base = isProof || isShell ? 'public' : 'web';
     let rel = isProof ? url.pathname.replace(/^\/proof\/?/, '') : url.pathname.replace(/^\//, '');
     if (!rel || rel.endsWith('/')) rel += 'index.html';
     const file = normalize(join(ROOT, base, rel));

@@ -69,6 +69,9 @@ async function adopt() {
     renderProposal();
     toast('Rule confirmed and signed into the public log');
     await refresh();
+    const weighted = state.rule.rule.legs.some((l) => l.kind === 'by_weight');
+    window.desk?.close('rule');
+    window.desk?.open(weighted ? 'deliveries' : 'sale');
   } catch (err) {
     btn.disabled = false;
     toast(err.message);
@@ -89,13 +92,16 @@ function renderActiveRule() {
 // ---- step 2: deliveries ------------------------------------------------------------------
 function renderDeliveries() {
   const r = state.rule;
-  const section = $('step-deliveries');
   const members = r ? [...new Set(r.rule.legs.filter((l) => l.kind === 'by_weight').flatMap((l) => l.payees))] : [];
-  section.hidden = members.length === 0;
-  if (!members.length) return;
-  const key = `${r.hash}`;
+  document.querySelectorAll('[data-open="deliveries"]').forEach((b) => { b.disabled = members.length === 0; });
+  $('btn-del').disabled = members.length === 0;
+  const key = r ? `${r.hash}` : 'none';
   if (key === delKey) return; // do not wipe what the owner is typing
   delKey = key;
+  if (!members.length) {
+    $('del-rows').innerHTML = `<p class="empty">${r ? 'This rule has no payees shared by weight, so there is nothing to record.' : 'Confirm a rule first.'}</p>`;
+    return;
+  }
   const cur = state.deliveries?.entries ?? {};
   $('del-rows').innerHTML = members.map((id) => `
     <div class="del-row"><label for="kg-${esc(id)}">${esc(r.rule.payees[id].label)} (kg)</label>
@@ -109,6 +115,8 @@ $('del-form').addEventListener('submit', async (e) => {
     await api('/api/deliveries', { period: $('del-period').value, entries });
     setStatus('del-status', 'Saved and signed into the log.');
     await refresh();
+    window.desk?.close('deliveries');
+    window.desk?.open('sale');
   } catch (err) { setStatus('del-status', err.message, true); }
 });
 
@@ -140,7 +148,7 @@ $('open-invoices').addEventListener('click', async (e) => {
   if (pay) {
     pay.disabled = true;
     pay.textContent = 'Paying…';
-    try { await api('/api/demo/pay', { payment_hash: pay.dataset.pay }); toast('Paid. The engine is splitting it now.'); } catch (err) { toast(err.message); pay.disabled = false; pay.textContent = 'Pay it as the demo buyer (test only)'; }
+    try { await api('/api/demo/pay', { payment_hash: pay.dataset.pay }); toast('Paid. The engine is splitting it now.'); window.desk?.open('sales'); } catch (err) { toast(err.message); pay.disabled = false; pay.textContent = 'Pay it as the demo buyer (test only)'; }
   }
 });
 
@@ -181,7 +189,8 @@ function renderHeader() {
   $('pubkey').textContent = `${state.pubkey.slice(0, 12)}…${state.pubkey.slice(-6)}`;
   $('log-count').textContent = `${state.log_entries} log entries, ${state.published} published to relays.`;
   $('demo-handles').textContent = state.demo_handles.filter((h) => h !== 'buyer').join(', ');
-  $('step-sale').hidden = !state.rule;
+  document.querySelectorAll('[data-open="sale"]').forEach((b) => { b.disabled = !state.rule; });
+  $('btn-sale').disabled = !state.rule;
 }
 
 async function refresh() {

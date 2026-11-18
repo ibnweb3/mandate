@@ -1,0 +1,121 @@
+/* Retro CRT computer shell, shared by the owner console and the public proof page.
+   Drawn entirely in CSS/SVG. Layout idea after the "Nostalgia Computer" desktop look. */
+:root {
+  --bg: #0c0904; --surface: #100b05; --ink: #ffcf6b; --muted: #c9964a; --line: #6b4a14;
+  --accent: #ffb000; --accent-ink: #130c00;
+  --good: #7dffa8; --warn: #ffb000; --bad: #ff7468;
+  --font: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --pixel: "Silkscreen", "IBM Plex Mono", ui-monospace, monospace;
+  --scale: 1;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+html { color-scheme: dark; -webkit-text-size-adjust: 100%; }
+body { margin: 0; font: 14px/1.5 var(--font); color: var(--ink); background: #2a241c; overflow: hidden; -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); text-underline-offset: 3px; }
+code { font-family: var(--font); font-size: .9em; overflow-wrap: anywhere; }
+button, input, textarea { font: inherit; }
+:focus-visible { outline: 2px dashed var(--accent); outline-offset: 2px; }
+::selection { background: var(--accent); color: var(--accent-ink); }
+
+/* ---- the room ---- */
+.room { position: fixed; inset: 0; overflow: hidden;
+  background:
+    repeating-linear-gradient(115deg, rgba(255, 236, 200, .10) 0 38px, rgba(0, 0, 0, 0) 38px 96px),
+    radial-gradient(ellipse at 70% 10%, #d9c7a2 0%, #a89572 38%, #5e4f38 100%); }
+.stage-wrap { position: absolute; left: 50%; top: 50%; width: 1060px; height: 840px; transform: translate(-50%, -50%) scale(var(--scale)); transform-origin: center; }
+.stage { position: relative; width: 100%; height: 100%; }
+
+/* ---- the monitor ---- */
+.monitor { position: absolute; left: 0; top: 0; width: 1060px; height: 740px; border-radius: 30px 30px 18px 18px;
+  background: linear-gradient(180deg, #ece3cf 0%, #d8ccb0 55%, #c4b799 100%);
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, .55), inset 0 -10px 22px rgba(90, 70, 40, .35), 0 30px 50px rgba(30, 20, 5, .55), 0 6px 0 #a89a7b; }
+.bezel { position: absolute; left: 44px; top: 44px; width: 972px; height: 596px; border-radius: 26px; background: #14120d; }
+.bezel { box-shadow: inset 0 0 0 5px #0c0b08, inset 0 6px 18px rgba(0, 0, 0, .8), 0 2px 0 rgba(255, 255, 255, .5), 0 0 0 9px #bfb293; }
+.screen { position: absolute; left: 20px; top: 18px; right: 20px; bottom: 18px; border-radius: 34px / 26px; overflow: hidden; background: #0b0803;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, .9); isolation: isolate; text-shadow: 0 0 5px rgba(255, 176, 0, .3); }
+.chin { position: absolute; left: 44px; right: 44px; top: 664px; height: 56px; display: flex; align-items: center; gap: 14px; color: #8d7f5f; }
+.chin .badge { font: 700 11px var(--pixel); letter-spacing: .2em; text-transform: uppercase; margin-right: auto; }
+.chin .vents { display: flex; gap: 4px; }
+.chin .vents i { width: 3px; height: 22px; background: #a89a7b; box-shadow: 1px 0 0 rgba(255, 255, 255, .5); }
+.chin .led { width: 9px; height: 9px; border-radius: 50%; background: #5cff7a; box-shadow: 0 0 8px #5cff7a; }
+.chin .power { width: 22px; height: 22px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #4a463d, #17150f); box-shadow: 0 2px 0 rgba(255, 255, 255, .5), inset 0 -2px 3px #000; }
+.base { position: absolute; left: 140px; width: 780px; top: 740px; height: 56px; border-radius: 0 0 40px 40px / 0 0 22px 22px;
+  background: linear-gradient(180deg, #bfb293, #9d9071); box-shadow: 0 24px 30px rgba(30, 20, 5, .5); }
+
+/* ---- the screen contents ---- */
+.desktop { position: absolute; inset: 0 0 38px 0; }
+.icons { position: absolute; left: 26px; top: 22px; display: grid; grid-template-columns: repeat(2, 86px); gap: 14px 8px; z-index: 1; }
+.icon { appearance: none; background: none; border: 0; color: var(--accent); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 2px;
+  font: 600 11px var(--font); text-decoration: none; text-shadow: inherit; }
+.icon svg { width: 44px; height: 44px; shape-rendering: crispEdges; fill: rgba(255, 176, 0, .09); stroke: currentColor; stroke-width: 2; stroke-linejoin: miter; stroke-linecap: butt; filter: drop-shadow(0 0 4px rgba(255, 176, 0, .45)); }
+.icon:hover:not(:disabled), .icon:focus-visible { background: var(--accent); color: var(--accent-ink); text-shadow: none; }
+.icon:hover:not(:disabled) svg { filter: none; fill: rgba(0, 0, 0, .1); }
+.icon:disabled { opacity: .38; cursor: not-allowed; }
+.hero-text { position: absolute; right: 34px; bottom: 30px; width: max-content; max-width: 600px; text-align: right; pointer-events: none; }
+.hero-text p { margin: 0 0 8px; max-width: 380px; margin-left: auto; color: var(--accent); font-size: 14px; }
+.hero-text .title { margin: 0; font: 700 76px/.95 var(--pixel); color: var(--accent); letter-spacing: -.02em; text-shadow: 0 0 14px rgba(255, 176, 0, .55); }
+.hint-line { position: absolute; left: 26px; bottom: 10px; margin: 0; font-size: 11px; color: var(--muted); }
+
+/* ---- windows ---- */
+.win { position: absolute; display: flex; flex-direction: column; background: var(--surface); border: 2px solid var(--accent); box-shadow: 5px 5px 0 rgba(0, 0, 0, .6); min-width: 280px; min-height: 160px; }
+.win[hidden] { display: none; }
+.win.max { left: 6px !important; top: 6px !important; width: calc(100% - 12px) !important; height: calc(100% - 6px) !important; }
+.win-bar { display: flex; align-items: center; gap: 8px; background: var(--accent); color: var(--accent-ink); padding: 3px 4px 3px 10px; cursor: grab; user-select: none; touch-action: none; text-shadow: none;
+  font: 700 12px var(--font); text-transform: uppercase; letter-spacing: .1em; }
+.win-bar:active { cursor: grabbing; }
+.win-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.win-btn { appearance: none; width: 22px; height: 22px; display: grid; place-items: center; background: var(--accent-ink); color: var(--accent); border: 0; cursor: pointer; font: 700 13px/1 var(--font); }
+.win-btn:hover { background: #fff3d1; color: var(--accent-ink); }
+.win-crumb { flex: none; padding: 5px 12px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+.win-crumb b { color: var(--ink); font-weight: 600; }
+.win-body { flex: 1; overflow: auto; padding: 16px 18px 18px; scrollbar-color: var(--accent) #1a1206; scrollbar-width: thin; }
+.win:not(.active) .win-bar { background: #6b4a14; color: #ffe2a0; }
+
+/* ---- taskbar ---- */
+.taskbar { position: absolute; left: 0; right: 0; bottom: 0; height: 38px; display: flex; align-items: center; gap: 8px; padding: 0 10px; background: #0f0a04; border-top: 2px solid var(--line); z-index: 20; }
+.quick { display: flex; gap: 4px; padding-right: 8px; border-right: 1px solid var(--line); }
+.quick button { appearance: none; background: none; border: 1px solid var(--line); color: var(--accent); width: 26px; height: 26px; padding: 2px; cursor: pointer; }
+.quick button svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 2.4; shape-rendering: crispEdges; }
+.quick button:hover:not(:disabled) { background: var(--accent); color: var(--accent-ink); }
+.quick button:disabled { opacity: .35; cursor: not-allowed; }
+.tasks { display: flex; gap: 6px; flex: 1; overflow: hidden; }
+.task { appearance: none; border: 1px solid var(--line); background: none; color: var(--ink); font: 700 11px var(--font); padding: 3px 10px; cursor: pointer; text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; }
+.task.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); text-shadow: none; }
+.sys { display: flex; align-items: center; gap: 14px; font-size: 11px; white-space: nowrap; }
+.sys .net { color: var(--warn); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.sys dl { display: flex; gap: 12px; margin: 0; }
+.sys dl div { display: flex; gap: 5px; }
+.sys dt { color: var(--muted); }
+.sys dd { margin: 0; font-variant-numeric: tabular-nums; }
+.clock { font-variant-numeric: tabular-nums; font-weight: 700; padding: 2px 8px; border: 1px solid var(--line); }
+
+/* ---- CRT glass ---- */
+.crt { position: absolute; inset: 0; pointer-events: none; z-index: 40;
+  background:
+    repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0) 0 2px, rgba(0, 0, 0, .22) 3px),
+    radial-gradient(ellipse at center, rgba(255, 176, 0, .05) 0%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, .55) 100%); mix-blend-mode: multiply; }
+.crt::after { content: ""; position: absolute; inset: 0; background: linear-gradient(115deg, rgba(255, 255, 255, .07) 0%, rgba(255, 255, 255, 0) 32%); }
+
+/* ---- small screens: no monitor, the desktop fills the page ---- */
+@media (max-width: 719px) {
+  body { overflow: auto; }
+  .room { position: static; min-height: 100%; background: #0b0803; }
+  .stage-wrap { position: static; width: 100%; height: auto; transform: none; }
+  .stage { height: auto; }
+  .monitor, .bezel { position: static; width: auto; height: auto; box-shadow: none; background: none; border-radius: 0; }
+  .chin, .base { display: none; }
+  .screen { position: relative; inset: auto; height: 100dvh; border-radius: 0; }
+  .icons { grid-template-columns: repeat(3, 84px); }
+  .hero-text { left: 16px; right: 16px; max-width: none; bottom: 40px; }
+  .hero-text .title { font-size: 46px; }
+  .win { left: 0 !important; top: 0 !important; width: 100% !important; height: calc(100% + 0px) !important; }
+  .win-bar { cursor: default; }
+  .sys dl, .sys .net { display: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .screen { animation: flick 8s infinite steps(1); }
+  @keyframes flick { 0%, 94%, 100% { opacity: 1; } 95% { opacity: .98; } 97% { opacity: 1; } }
+  .win:not([hidden]) { animation: pop .12s steps(3); }
+  @keyframes pop { from { transform: scale(.97); } to { transform: none; } }
+}

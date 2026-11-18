@@ -31,15 +31,22 @@ function exportSnapshot() {
   exported = log.entries.length;
 }
 
-async function wallet() {
-  const out = { balance_sats: null, payer_budget: null };
-  try { out.balance_sats = Math.floor((await wallets.listener.getBalance()).balance / 1000); } catch { /* shown as unavailable */ }
+// Wallet numbers are refreshed in the background and cached, so a slow relay never stalls the console.
+let walletInfo = { balance_sats: null, payer_budget: null };
+let refreshing = false;
+const within = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
+async function refreshWallet() {
+  if (refreshing) return;
+  refreshing = true;
   try {
-    const b = await wallets.payer.getBudget();
-    if (b?.total_budget != null) out.payer_budget = { used_sats: Math.floor(b.used_budget / 1000), total_sats: Math.floor(b.total_budget / 1000), renewal: b.renewal_period };
-  } catch { /* shown as unavailable */ }
-  return out;
+    try { walletInfo.balance_sats = Math.floor((await within(wallets.listener.getBalance(), 8000)).balance / 1000); } catch { /* keep the last known value */ }
+    try {
+      const b = await within(wallets.payer.getBudget(), 8000);
+      if (b?.total_budget != null) walletInfo.payer_budget = { used_sats: Math.floor(b.used_budget / 1000), total_sats: Math.floor(b.total_budget / 1000), renewal: b.renewal_period };
+    } catch { /* keep the last known value */ }
+  } finally { refreshing = false; }
 }
+const wallet = async () => walletInfo;
 
 const json = (res, code, body) => { res.writeHead(code, { 'content-type': 'application/json', 'cache-control': 'no-store' }); res.end(JSON.stringify(body)); };
 const readBody = (req) => new Promise((resolve, reject) => {
@@ -116,7 +123,7 @@ const server = createServer(async (req, res) => {
 // Listen for sales; catch up on any that landed while we were offline.
 let unsub = null;
 async function listen() {
-  unsub = await wallets.listener.subscribeNotifications((n) => { engine.handlePayment(n).then(exportSnapshot); }, ['payment_received']);
+  unsub = await wallets.listener.subscribeNotifications((n) => { engine.handlePayment(n).then(() => { exportSnapshot(); refreshWallet(); }); }, ['payment_received']);
   await engine.catchUp();
   await log.republishPending();
   exportSnapshot();
@@ -128,5 +135,6 @@ server.listen(PORT, '127.0.0.1', () => {
   console.log(`Rule parser: ${llm ? 'LLM + built-in grammar' : 'built-in grammar (set GROQ_API_KEY in .env to add an LLM)'}`);
   listen().catch((e) => console.error('listen failed:', e?.message ?? e));
 });
+refreshWallet(); setInterval(refreshWallet, 4000).unref();
 setInterval(() => log.republishPending().then(exportSnapshot).catch(() => {}), 60_000).unref();
 process.on('SIGINT', () => { try { unsub?.(); wallets.close(); } finally { process.exit(0); } });

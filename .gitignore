@@ -5,3 +5,4 @@ node_modules/
 data/
 .codex-pass.md
 public/proof-data.json
+docs/demo/

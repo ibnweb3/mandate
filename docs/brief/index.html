@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mandate: project brief (Dakar Bitcoin Hack 2026)</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; font: 11.5px/1.5 "Segoe UI", Arial, sans-serif; color: #14181b; background: #fff; }
+  .page { width: 210mm; height: 297mm; padding: 16mm 17mm; position: relative; page-break-after: always; overflow: hidden; }
+  .page:last-child { page-break-after: auto; }
+  .hero { background: #020b14; color: #ffb648; margin: -16mm -17mm 8mm; padding: 14mm 17mm 10mm; font-family: Consolas, "Courier New", monospace; }
+  .hero h1 { margin: 0; font-size: 40px; letter-spacing: -.02em; }
+  .hero p { margin: 6px 0 0; font-size: 13px; color: #ffcf6b; max-width: 150mm; }
+  .hero .meta { margin-top: 10px; font-size: 10.5px; color: #c9964a; }
+  h2 { font-size: 15px; margin: 6mm 0 2mm; color: #020b14; border-bottom: 2px solid #ffb648; padding-bottom: 2px; }
+  h2:first-child { margin-top: 0; }
+  p { margin: 0 0 7px; }
+  ul { margin: 0 0 7px; padding-left: 16px; }
+  li { margin: 0 0 3px; }
+  code { font-family: Consolas, "Courier New", monospace; font-size: .92em; background: #f2efe6; padding: 0 3px; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; }
+  .box { border: 1px solid #d8d2c0; background: #faf8f1; padding: 8px 10px; margin: 0 0 7px; }
+  .box b { color: #020b14; }
+  table { width: 100%; border-collapse: collapse; margin: 0 0 7px; font-size: 11px; }
+  th { text-align: left; background: #020b14; color: #ffb648; padding: 4px 7px; font-weight: 600; }
+  td { padding: 4px 7px; border-bottom: 1px solid #e4dfcf; vertical-align: top; }
+  .ok { color: #0b6b3a; font-weight: 600; } .no { color: #a12626; font-weight: 600; }
+  .shots { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; margin: 3mm 0; }
+  .shots figure { margin: 0; }
+  .shots img { width: 100%; display: block; border: 1px solid #d8d2c0; }
+  figcaption { font-size: 10px; color: #555; margin-top: 2px; }
+  .links td:first-child { width: 34mm; font-weight: 600; }
+  a { color: #0a58b5; }
+  .foot { position: absolute; left: 17mm; right: 17mm; bottom: 9mm; font-size: 9.5px; color: #777; display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+
+<section class="page">
+  <div class="hero">
+    <h1>Mandate</h1>
+    <p>Write a payout rule once, in plain words. Bitcoin Lightning pays everyone, and the wallet itself refuses to overspend.</p>
+    <div class="meta">Project brief for judges and organizers · Dakar Bitcoin Hack 2026 · signet test network, test sats</div>
+  </div>
+
+  <h2>The problem, in one picture</h2>
+  <p>A group of farmers sells shea butter together. A buyer pays once, in one lump. Then someone must work out who is owed what and pay every farmer, usually by hand, usually late, always on trust. A trader who owes a supplier has the same problem: remember to hand over a slice of every sale until the debt is cleared. The person holding the money is also the person everyone has to believe.</p>
+
+  <h2>What Mandate does</h2>
+  <p>You write the rule in a sentence:</p>
+  <div class="box"><b>"10% of each sale goes to Coop. Split the rest between Amadou, Fatou and Ousmane by kg delivered."</b><br>
+  <b>"20% of each sale goes to my supplier until 500,000 sats are repaid."</b></div>
+  <ol>
+    <li>An AI (or a built-in reader) only <b>proposes</b> a rule. Mandate shows it in plain English and the owner confirms it. After that the AI is out of the picture.</li>
+    <li>A sale arrives as a Lightning invoice.</li>
+    <li>Deterministic code splits it by the confirmed rule and pays each person over Lightning in seconds. It pays each farmer, and repays a supplier's debt from every sale, stopping at the cap.</li>
+    <li>The payout connection has a spending budget <b>enforced by the wallet</b>. Even a bug in our code cannot pay out more.</li>
+    <li>Every step is signed and published on Nostr. A public proof page re-checks signatures, the chain, the arithmetic and every Lightning receipt in the visitor's browser, with no wallet and no login.</li>
+  </ol>
+
+  <h2>How a sale flows</h2>
+  <svg viewBox="0 0 700 150" width="100%" role="img" aria-label="Flow: sentence, AI proposes, owner confirms, rule; sale invoice, listener, engine plans and logs, payer pays within wallet budget, farmers and supplier; signed log to Nostr relays to proof page">
+    <style>.b{fill:#faf8f1;stroke:#020b14;stroke-width:1.2}.k{fill:#020b14;stroke:#020b14}.t{font:11px Consolas,monospace;fill:#020b14}.w{font:11px Consolas,monospace;fill:#ffb648}.a{stroke:#555;stroke-width:1.2;fill:none;marker-end:url(#h)}</style>
+    <defs><marker id="h" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#555"/></marker></defs>
+    <rect class="b" x="4" y="8" width="110" height="38"/><text class="t" x="12" y="24">Sentence</text><text class="t" x="12" y="38">in plain words</text>
+    <rect class="b" x="150" y="8" width="110" height="38"/><text class="t" x="158" y="24">AI proposes</text><text class="t" x="158" y="38">owner confirms</text>
+    <rect class="k" x="296" y="8" width="110" height="38"/><text class="w" x="304" y="24">Rule (hashed)</text><text class="w" x="304" y="38">signed on Nostr</text>
+    <path class="a" d="M114,27 H148"/><path class="a" d="M260,27 H294"/>
+    <rect class="b" x="4" y="92" width="110" height="38"/><text class="t" x="12" y="108">Sale invoice</text><text class="t" x="12" y="122">buyer pays</text>
+    <rect class="b" x="150" y="92" width="110" height="38"/><text class="t" x="158" y="108">Listener</text><text class="t" x="158" y="122">cannot spend</text>
+    <rect class="k" x="296" y="92" width="110" height="38"/><text class="w" x="304" y="108">Engine</text><text class="w" x="304" y="122">plan logged first</text>
+    <rect class="k" x="442" y="92" width="110" height="38"/><text class="w" x="450" y="108">Payer</text><text class="w" x="450" y="122">wallet-set budget</text>
+    <rect class="b" x="588" y="92" width="108" height="38"/><text class="t" x="596" y="108">Farmers and</text><text class="t" x="596" y="122">supplier paid</text>
+    <path class="a" d="M114,111 H148"/><path class="a" d="M260,111 H294"/><path class="a" d="M406,111 H440"/><path class="a" d="M552,111 H586"/>
+    <path class="a" d="M351,46 V90"/>
+    <rect class="b" x="442" y="8" width="254" height="38"/><text class="t" x="450" y="24">Signed log on Nostr relays</text><text class="t" x="450" y="38">public proof page re-checks it</text>
+    <path class="a" d="M406,27 H440"/>
+  </svg>
+
+  <div class="foot"><span>Mandate · Dakar Bitcoin Hack 2026</span><span>1 / 3</span></div>
+</section>
+
+<section class="page">
+  <h2>Why Bitcoin Lightning is central</h2>
+  <p>Mandate needs four things at once, and Lightning with Nostr gives all of them. Take any one away and it becomes a spreadsheet with a promise.</p>
+  <table>
+    <tr><th>Need</th><th>What provides it</th></tr>
+    <tr><td>Instant, tiny payments</td><td>Lightning, so a farmer is paid per sale, not at the end of the week.</td></tr>
+    <tr><td>A receipt that cannot be faked</td><td>The payment preimage hashes to the invoice. The proof page checks it for every payout.</td></tr>
+    <tr><td>A limit the wallet enforces</td><td>Nostr Wallet Connect (NIP-47) connection with a budget. The wallet answers <code>QUOTA_EXCEEDED</code> when it is used up.</td></tr>
+    <tr><td>A public, tamper-evident record</td><td>Hash-chained entries, signed with a Nostr key, published to public relays.</td></tr>
+  </table>
+
+  <h2>Security by design</h2>
+  <ul>
+    <li><b>AI never decides money.</b> It proposes; a person confirms; deterministic code decides amounts.</li>
+    <li><b>Two wallet connections.</b> A listener that can make invoices and hear payments but cannot spend, and a payer that can only pay, with a wallet-set budget.</li>
+    <li><b>Plan before payment.</b> The split is written to the signed log before any sat moves.</li>
+    <li><b>No double pay.</b> Sales are deduplicated by payment hash, because notifications can replay.</li>
+    <li><b>Never trust a payee invoice.</b> The engine decodes it and refuses one whose amount differs from the rule.</li>
+    <li><b>Local console protection.</b> The owner console is bound to this computer, checks Host and Origin, and restricts who may frame it.</li>
+    <li><b>Verifiable by anyone.</b> One verifier file runs in Node (tests) and in the browser (proof page).</li>
+  </ul>
+
+  <h2>What the demo shows (all on signet, test sats)</h2>
+  <table>
+    <tr><th>Step</th><th>Result</th></tr>
+    <tr><td>Rule confirmed, deliveries 50 / 30 / 20 kg</td><td>Signed into the log before any sale.</td></tr>
+    <tr><td>Sale of 1,000 sats</td><td><span class="ok">Settled</span>: co-op 100, Amadou 450, Fatou 270, Ousmane 180. Each has a Lightning receipt.</td></tr>
+    <tr><td>Sale of 3,000 sats, weekly budget 3,000</td><td>Co-op 300 and Amadou 1,350 <span class="ok">paid</span>. Fatou 810 and Ousmane 540 <span class="no">refused by the wallet</span> (<code>QUOTA_EXCEEDED</code>), recorded in the log.</td></tr>
+    <tr><td>Public proof page</td><td>Both sales verified from the Nostr relays: signatures, chain, arithmetic, receipts. Refusals shown as refused.</td></tr>
+    <tr><td>"Try to cheat" button</td><td>One payout altered in the browser; the check fails at once.</td></tr>
+  </table>
+
+  <div class="shots">
+    <figure><img src="../gallery/6-wallet-refuses-overspend.jpg" alt="Wallet refuses overspend"><figcaption>The wallet refuses the payouts that exceed its budget.</figcaption></figure>
+    <figure><img src="../gallery/7-public-proof-verified.jpg" alt="Public proof verified"><figcaption>The public proof page verifies both sales, refusals included.</figcaption></figure>
+  </div>
+
+  <div class="foot"><span>Mandate · Dakar Bitcoin Hack 2026</span><span>2 / 3</span></div>
+</section>
+
+<section class="page">
+  <h2>What is real, and what is a stand-in</h2>
+  <div class="cols">
+    <div class="box"><b class="ok">Real</b>
+      <ul>
+        <li>Lightning payments between wallets on a signet Alby Hub (LDK)</li>
+        <li>The wallet-enforced budget and its refusals</li>
+        <li>The Nostr-signed log on public relays</li>
+        <li>The proof page and its verification</li>
+        <li>27 automated tests (rule maths, engine, parser, verifier, tamper detection)</li>
+      </ul></div>
+    <div class="box"><b class="no">Stand-in or not yet done</b>
+      <ul>
+        <li>Everything uses <b>test sats</b> on signet, not real money</li>
+        <li>A test wallet plays the buyer; the farmers' "addresses" are test wallets on the same hub</li>
+        <li>Lightning-address payouts (LNURL-pay) are built but not run on signet</li>
+        <li>The owner console runs on the owner's own computer (not hosted, to keep the wallet connection off the internet)</li>
+        <li>No real users yet, and no adoption claims</li>
+      </ul></div>
+  </div>
+
+  <h2>How it is built</h2>
+  <ul>
+    <li><b>Engine:</b> Node.js. The rule schema and split arithmetic are pure functions shared with the browser (largest-remainder rounding; the sum of payouts plus what the owner keeps always equals the sale, property-tested).</li>
+    <li><b>Wallet:</b> Alby Hub (LDK, signet) with <code>@getalby/sdk</code> over Nostr Wallet Connect.</li>
+    <li><b>Log and proof:</b> <code>nostr-tools</code> signing and publishing; a browser verifier that trusts nothing the engine says.</li>
+    <li><b>Interface:</b> the Nostalgia Computer template remixed in Framer, a retro desktop where every page opens like a file. A Cloudflare Worker serves the desktop and the project's own pages (proof embed, console gateway, demo video).</li>
+    <li><b>AI use:</b> built with Claude Code under the author's direction. The product's own AI only proposes a rule from a sentence. The demo voice-over was generated with ElevenLabs.</li>
+  </ul>
+
+  <h2>Links</h2>
+  <table class="links">
+    <tr><td>Live desktop</td><td><a href="https://mandate-proof.ibnweb3lab.workers.dev/">https://mandate-proof.ibnweb3lab.workers.dev/</a></td></tr>
+    <tr><td>Demo video (3 min)</td><td><a href="https://youtu.be/Wg_sTXJsi2w">https://youtu.be/Wg_sTXJsi2w</a></td></tr>
+    <tr><td>Source code (MIT)</td><td><a href="https://github.com/ibnweb3/mandate">https://github.com/ibnweb3/mandate</a></td></tr>
+    <tr><td>Announcement post</td><td><a href="https://x.com/ibnWeb3/status/2123400231106580570">https://x.com/ibnWeb3/status/2123400231106580570</a></td></tr>
+  </table>
+
+  <h2>What's next</h2>
+  <p>Run the Lightning-address path on mainnet with a real pilot (a farmers' group or a small trading group); a visible history of rule changes; a phone-friendly owner view; a hosted option that keeps the wallet connection on the owner's device.</p>
+
+  <div class="foot"><span>Mandate · Dakar Bitcoin Hack 2026</span><span>3 / 3</span></div>
+</section>
+
+</body>
+</html>

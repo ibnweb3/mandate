@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mandate proof (embedded)</title>
+  <meta name="color-scheme" content="dark">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="embed.css">
+  <link rel="stylesheet" href="../proof.css">
+</head>
+<body>
+  <h2>Overall result</h2>
+  <div id="summary" aria-live="polite"><p class="empty">Loading the log…</p></div>
+  <div id="sources" class="meta"></div>
+
+  <h2>Sales</h2>
+  <div id="sales"></div>
+
+  <h2>Try to cheat</h2>
+  <p class="meta">Pretend you are a dishonest operator. This changes one payout amount in your own copy of the log, then runs the same check again. Nothing leaves your browser.</p>
+  <div class="row"><button class="btn" id="btn-cheat" type="button">Alter one payout and re-check</button><button class="btn ghost" id="btn-reset" type="button" hidden>Restore the real log</button></div>
+  <div id="cheat-out" aria-live="polite"></div>
+
+  <h2>The signed log</h2>
+  <p class="meta">Each entry contains the hash of the one before it and is signed with the key below. Changing or removing any entry breaks the chain.</p>
+  <div id="log"></div>
+  <p class="meta">Signing key <code id="pubkey">…</code>. Verifier code: <a href="../lib/verify.mjs">verify.mjs</a>, <a href="../lib/rule.mjs">rule.mjs</a>. All sats are signet test sats.</p>
+  <script type="module" src="../proof.js"></script>
+</body>
+</html>

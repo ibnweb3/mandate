@@ -38,7 +38,7 @@ const target = new URLSearchParams(location.hash.slice(1)).get('sale');
 
 async function load() {
   let snap = null;
-  try { snap = await (await fetch('proof-data.json', { cache: 'no-store' })).json(); } catch { /* relays only */ }
+  try { snap = await (await fetch(new URL('proof-data.json', import.meta.url), { cache: 'no-store' })).json(); } catch { /* relays only */ }
   pubkey = new URLSearchParams(location.search).get('pk') || snap?.pubkey || '';
   if (!/^[0-9a-f]{64}$/.test(pubkey)) {
     $('summary').innerHTML = '<p class="empty">No signing key known yet. Nothing has been logged.</p>';

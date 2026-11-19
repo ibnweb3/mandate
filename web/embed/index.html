@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mandate console</title>
+  <meta name="color-scheme" content="dark">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="/embed/embed.css">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="bar">
+    <nav class="tabs" role="tablist" aria-label="Console steps">
+      <button type="button" role="tab" class="tab" data-open="rule" aria-selected="true">1 Rule</button>
+      <button type="button" role="tab" class="tab" data-open="deliveries" aria-selected="false">2 Deliveries</button>
+      <button type="button" role="tab" class="tab" data-open="sale" aria-selected="false">3 New sale</button>
+      <button type="button" role="tab" class="tab" data-open="sales" aria-selected="false">4 Payouts</button>
+    </nav>
+    <dl class="stats" aria-live="polite"><div><dt>Wallet</dt><dd id="st-balance">…</dd></div><div><dt>Budget</dt><dd id="st-budget">…</dd></div></dl>
+  </header>
+
+  <main>
+    <section class="pane" id="pane-rule" role="tabpanel">
+      <div id="rule-active" hidden></div>
+      <form id="rule-form">
+        <div class="field"><label for="rule-name">Name this rule</label><input id="rule-name" type="text" value="Shea co-op payouts" maxlength="80" autocomplete="off"></div>
+        <label for="rule-text">Say how each sale should be shared</label>
+        <textarea id="rule-text" rows="3" spellcheck="false" placeholder="10% of each sale goes to Coop. Split the rest between Amadou, Fatou and Ousmane by kg delivered."></textarea>
+        <p class="hint">Names that match a test wallet (<span id="demo-handles">coop, amadou, fatou, ousmane, supplier</span>) are paid there. Real Lightning addresses plug into the same slot.</p>
+        <div class="row"><button class="btn" type="submit" id="btn-read">Read my rule</button><span id="rule-status" class="status" aria-live="polite"></span></div>
+      </form>
+      <div id="proposal" hidden></div>
+    </section>
+
+    <section class="pane" id="pane-deliveries" role="tabpanel" hidden>
+      <form id="del-form">
+        <div class="field"><label for="del-period">Period</label><input id="del-period" type="text" value="Week 1" maxlength="40" autocomplete="off"></div>
+        <div id="del-rows" class="del-rows"></div>
+        <div class="row"><button class="btn" type="submit" id="btn-del">Save deliveries</button><span id="del-status" class="status" aria-live="polite"></span></div>
+      </form>
+    </section>
+
+    <section class="pane" id="pane-sale" role="tabpanel" hidden>
+      <form id="sale-form">
+        <div class="grid2">
+          <div class="field"><label for="sale-sats">Amount (sats)</label><input id="sale-sats" type="number" inputmode="numeric" min="1" max="1000000" value="1000" step="1"></div>
+          <div class="field"><label for="sale-note">What was sold</label><input id="sale-note" type="text" value="Shea butter, 40 jars" maxlength="80" autocomplete="off"></div>
+        </div>
+        <div class="row"><button class="btn" type="submit" id="btn-sale">Create the buyer's invoice</button><span id="sale-status" class="status" aria-live="polite"></span></div>
+      </form>
+      <div id="open-invoices"></div>
+    </section>
+
+    <section class="pane" id="pane-sales" role="tabpanel" hidden>
+      <div id="sales"><p class="empty">No sales yet. Create an invoice, then pay it.</p></div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>Signet test sats</span>
+    <span>Log signed by <code id="pubkey">…</code> · <span id="log-count"></span></span>
+    <a href="https://mandate-proof.ibnweb3lab.workers.dev/" target="_blank" rel="noopener">Public proof</a>
+  </footer>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <script>
+    // Single-window shim: the desktop version opens separate windows, here the steps are tabs.
+    (function () {
+      const tabs = [...document.querySelectorAll('.tab')];
+      const show = (id) => {
+        document.querySelectorAll('.pane').forEach((p) => { p.hidden = p.id !== 'pane-' + id; });
+        tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.open === id)));
+      };
+      tabs.forEach((t) => t.addEventListener('click', () => { if (!t.disabled) show(t.dataset.open); }));
+      window.desk = { open: show, close() {} };
+      // Tell a hosting page that the local engine answered.
+      try { parent.postMessage({ mandate: 'console-ready' }, '*'); } catch (e) { /* not framed */ }
+    })();
+  </script>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

@@ -113,7 +113,9 @@ const server = createServer(async (req, res) => {
     const file = normalize(join(ROOT, base, rel));
     if (!file.startsWith(normalize(join(ROOT, base)))) return json(res, 403, { error: 'no' });
     if (!existsSync(file)) return json(res, 404, { error: 'not found' });
-    res.writeHead(200, { 'content-type': MIME[extname(file)] ?? 'application/octet-stream', 'cache-control': 'no-store' });
+    // Only this machine and the project's own pages may frame the console (clickjacking protection).
+    const frame = { 'content-security-policy': "frame-ancestors 'self' https://mandate-proof.ibnweb3lab.workers.dev https://*.framer.app https://*.framer.website https://*.framer.com https://framer.com" };
+    res.writeHead(200, { 'content-type': MIME[extname(file)] ?? 'application/octet-stream', 'cache-control': 'no-store', ...(extname(file) === '.html' ? frame : {}) });
     res.end(readFileSync(file));
   } catch (e) {
     json(res, e.status ?? (e.code === 'INVALID_RULE' || e.code?.startsWith?.('BAD_') || e.code === 'NO_RULE' ? 400 : 500), { error: e.message, errors: e.errors });

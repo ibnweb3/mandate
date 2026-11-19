@@ -1,0 +1,26 @@
+/* Flat console for use inside another page (the Framer desktop window). Same amber look as the rest. */
+:root {
+  --bg: #0b0803; --surface: #100b05; --ink: #ffcf6b; --muted: #c9964a; --line: #6b4a14;
+  --accent: #ffb000; --accent-ink: #130c00; --good: #7dffa8; --warn: #ffb000; --bad: #ff7468;
+  --font: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html { color-scheme: dark; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 13px/1.5 var(--font); text-shadow: 0 0 5px rgba(255, 176, 0, .25); }
+a { color: var(--accent); text-underline-offset: 3px; }
+code { font-family: var(--font); font-size: .9em; overflow-wrap: anywhere; }
+button, input, textarea { font: inherit; }
+:focus-visible { outline: 2px dashed var(--accent); outline-offset: 2px; }
+::selection { background: var(--accent); color: var(--accent-ink); text-shadow: none; }
+.bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 8px 14px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--bg); z-index: 3; }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tab { appearance: none; background: none; border: 1px solid var(--line); color: var(--ink); padding: 3px 10px; cursor: pointer; text-transform: uppercase; letter-spacing: .06em; font-size: 11px; font-weight: 700; text-shadow: inherit; }
+.tab[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); text-shadow: none; }
+.tab:hover:not(:disabled):not([aria-selected="true"]) { border-color: var(--accent); color: var(--accent); }
+.tab:disabled { opacity: .38; cursor: not-allowed; }
+.stats { display: flex; gap: 16px; margin: 0 0 0 auto; font-size: 11px; }
+.stats div { display: flex; gap: 6px; }
+.stats dt { color: var(--muted); }
+.stats dd { margin: 0; font-variant-numeric: tabular-nums; }
+main { padding: 14px; }
+.foot { display: flex; gap: 14px; flex-wrap: wrap; padding: 8px 14px 14px; color: var(--muted); font-size: 11px; border-top: 1px dotted var(--line); }

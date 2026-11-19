@@ -6,3 +6,4 @@ data/
 .codex-pass.md
 public/proof-data.json
 docs/demo/
+public/demo/*.mp4

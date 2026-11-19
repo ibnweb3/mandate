@@ -14,7 +14,8 @@
     html, body { height: 100%; margin: 0; }
     body { background: var(--bg); color: var(--ink); font: 13px/1.55 "IBM Plex Mono", ui-monospace, Consolas, monospace; text-shadow: 0 0 5px rgba(255,176,0,.25); }
     iframe { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; background: var(--bg); }
-    #fallback { padding: 18px 20px; max-width: 62ch; }
+    #fallback { position: fixed; inset: 0; padding: 18px 20px; background: var(--bg); z-index: 5; overflow: auto; }
+    #fallback > div { max-width: 62ch; }
     #fallback[hidden] { display: none; }
     h1 { font-size: 13px; margin: 0 0 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--accent); }
     a { color: var(--accent); text-underline-offset: 3px; }
@@ -23,22 +24,22 @@
   </style>
 </head>
 <body>
-  <div id="fallback" hidden>
+  <div id="fallback" hidden><div>
     <h1>Owner console</h1>
     <p>The console runs next to the wallet, on the owner's own computer, so it can't be reached from here. That keeps the wallet connection off the internet.</p>
     <p>To see it working, open the <b>Demo</b> window. To run it yourself, follow the README: <a href="https://github.com/ibnweb3/mandate" target="_blank" rel="noopener">github.com/ibnweb3/mandate</a>. The public <b>Proof</b> window works for everyone.</p>
     <p class="meta" style="color:var(--muted)">If you are the owner: start the engine (<code>npm start</code>), then reload this window.</p>
-  </div>
+  </div></div>
   <script>
     // Try the engine on this computer. It tells us (postMessage) when its page has loaded; if nothing answers, explain why.
     const LOCAL = 'http://localhost:8787/embed/';
     let ready = false;
-    addEventListener('message', (e) => { if (e.origin === 'http://localhost:8787' && e.data && e.data.mandate === 'console-ready') ready = true; });
+    addEventListener('message', (e) => { if (e.origin === 'http://localhost:8787' && e.data && e.data.mandate === 'console-ready') { ready = true; document.getElementById('fallback').hidden = true; } });
     const f = document.createElement('iframe');
     f.title = 'Mandate owner console';
     f.src = LOCAL;
     document.body.appendChild(f);
-    setTimeout(() => { if (!ready) { f.remove(); document.getElementById('fallback').hidden = false; } }, 3500);
+    setTimeout(() => { if (!ready) document.getElementById('fallback').hidden = false; }, 6000);
   </script>
 </body>
 </html>

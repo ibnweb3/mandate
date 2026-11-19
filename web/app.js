@@ -152,7 +152,7 @@ $('open-invoices').addEventListener('click', async (e) => {
   }
 });
 
-const STATE = { paid: ['Paid', ''], pending: ['Paying…', 'warn'], planned: ['Queued', 'warn'], refused: ['Refused by wallet', 'bad'], failed: ['Failed', 'bad'] };
+const STATE = { paid: ['Paid', ''], pending: ['Paying…', 'warn'], planned: ['Queued', 'warn'], refused: ['Refused by wallet', 'bad'], failed: ['Failed', 'bad'], unconfirmed: ['Needs a check', 'warn'] };
 function renderSales() {
   const el = $('sales');
   if (!state.sales.length) { setHtml(el, '<p class="empty">No sales yet. Create an invoice above, then pay it.</p>'); return; }
@@ -168,7 +168,7 @@ function renderSales() {
       <div class="sale-head"><strong>${fmt(s.amount_sats)} sats</strong><span><span class="chip ${overall[1]}">${overall[0]}</span> <span class="meta">${esc(s.note || '')}${s.period ? ` · ${esc(s.period)}` : ''}</span></span></div>
       <table><thead><tr><th>Who</th><th class="num">Sats</th><th>Status</th></tr></thead><tbody>${rows}${kept}</tbody></table>
       ${s.warnings?.length ? `<ul class="notes">${s.warnings.map((w) => `<li>${esc(w)}</li>`).join('')}</ul>` : ''}
-      <div class="row">${s.status === 'partial' ? `<button class="btn small" type="button" data-retry="${esc(s.payment_hash)}">Retry unpaid payouts</button>` : ''}
+      <div class="row">${(s.status === 'partial' || (s.status === 'paying' && Date.now() - Date.parse(s.received_at) > 90000)) ? `<button class="btn small" type="button" data-retry="${esc(s.payment_hash)}">Retry unpaid payouts</button>` : ''}
       <a class="meta" href="/proof/#sale=${esc(s.payment_hash)}" target="_blank" rel="noopener">Check this sale on the public proof page</a></div>
     </article>`;
   }).join(''));

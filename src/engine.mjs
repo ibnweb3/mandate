@@ -13,9 +13,10 @@ export class Engine {
    * payer:    { payInvoice({invoice}) }              (budget-capped by the wallet)
    * resolver: async (payee, sats, memo) => bolt11     (asks the payee's wallet for an invoice)
    * decode:   (bolt11) => { paymentHash, satoshi }
+   * check:    optional async (payee, paymentHash) => preimage | null   (did this payee's wallet receive it?)
    */
-  constructor({ store, log, listener, payer, resolver, decode }) {
-    Object.assign(this, { store, log, listener, payer, resolver, decode });
+  constructor({ store, log, listener, payer, resolver, decode, check = null }) {
+    Object.assign(this, { store, log, listener, payer, resolver, decode, check });
     this.queue = Promise.resolve();
   }
 
@@ -134,6 +135,19 @@ export class Engine {
   async #payOne(sale, p) {
     const rule = this.data.rule.rule;
     try {
+      // A payout left "pending" means the engine stopped between sending and recording. Ask the payee's wallet
+      // whether it actually received the payment; if so, record it with its receipt instead of paying again.
+      if (p.invoice && p.status === 'pending' && this.check) {
+        const pre = await this.check(rule.payees[p.payee], p.invoice_hash).catch(() => null);
+        if (pre && sha256Bytes(pre) === p.invoice_hash) {
+          Object.assign(p, { status: 'paid', preimage: pre, fees_msats: p.fees_msats ?? 0, error: undefined, recovered: true });
+          this.store.save();
+          await this.log.append('payout_sent', {
+            sale: sale.payment_hash, payee: p.payee, sats: p.sats, payment_hash: p.invoice_hash, preimage: p.preimage, fees_msats: p.fees_msats, recovered: true,
+          });
+          return;
+        }
+      }
       if (!p.invoice) {
         p.invoice = await this.resolver(rule.payees[p.payee], p.sats, `Payout from ${rule.name}`);
         const d = this.decode(p.invoice);
@@ -153,11 +167,13 @@ export class Engine {
     } catch (e) {
       const code = e?.code ?? 'ERROR';
       const refused = code === 'QUOTA_EXCEEDED' || code === 'RESTRICTED';
-      p.status = refused ? 'refused' : 'failed';
+      // The wallet says this invoice was already paid but we hold no receipt: never pay again, flag it for the owner.
+      const unconfirmed = !refused && /already (been )?(paid|sent)|duplicate|previously paid/i.test(String(e?.message ?? ''));
+      p.status = refused ? 'refused' : unconfirmed ? 'unconfirmed' : 'failed';
       p.error = `${code}: ${e?.message ?? e}`.slice(0, 200);
       if (refused || e?.final) { delete p.invoice; delete p.invoice_hash; } // definitely unpaid: a retry may use a fresh invoice
       this.store.save();
-      await this.log.append(refused ? 'payout_refused' : 'payout_failed', { sale: sale.payment_hash, payee: p.payee, sats: p.sats, error: p.error });
+      await this.log.append(refused ? 'payout_refused' : unconfirmed ? 'payout_unconfirmed' : 'payout_failed', { sale: sale.payment_hash, payee: p.payee, sats: p.sats, error: p.error });
     }
   }
 
@@ -167,6 +183,14 @@ export class Engine {
     if (!sale || sale.status === 'settled') return Promise.resolve(sale);
     this.queue = this.queue.then(() => this.#payAll(sale)).catch((e) => console.error('retry error:', e?.message ?? e));
     return this.queue.then(() => sale);
+  }
+
+  // On startup: finish any sale the engine was in the middle of paying when it stopped.
+  resumeUnfinished() {
+    for (const sale of Object.values(this.data.sales)) {
+      if (sale.status === 'paying') this.queue = this.queue.then(() => this.#payAll(sale)).catch((e) => console.error('resume error:', e?.message ?? e));
+    }
+    return this.queue;
   }
 
   idle() { return this.queue; }

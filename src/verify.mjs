@@ -81,7 +81,7 @@ export async function verifyLog(events, { pubkey, verifySignature }) {
       if (s) s.payouts.push({ ...d, ok, proof });
       if (ok) paid[d.payee] = (paid[d.payee] ?? 0) + d.sats;
       else problems.push(`Payout to ${d.payee} at entry #${e.seq} failed verification.`);
-    } else if (e.type === 'payout_refused' || e.type === 'payout_failed') {
+    } else if (e.type === 'payout_refused' || e.type === 'payout_failed' || e.type === 'payout_unconfirmed') {
       sales.get(d.sale)?.refused.push({ ...d, type: e.type });
     } else if (e.type === 'sale_settled' || e.type === 'sale_partial') {
       const s = sales.get(d.payment_hash);

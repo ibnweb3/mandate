@@ -91,7 +91,7 @@ function saleCard(s) {
     const ref = s.refused.find((x) => x.payee === p.payee);
     const cell = paid
       ? `<span class="chip">Paid</span><div class="meta">proof: <code>${esc(short(paid.preimage, 14))}</code> hashes to <code>${esc(short(paid.payment_hash, 14))}</code> ✓</div>`
-      : ref ? `<span class="chip bad">${ref.type === 'payout_refused' ? 'Refused by the wallet' : 'Failed'}</span><div class="meta">${esc(ref.error)}</div>`
+      : ref ? `<span class="chip bad">${ref.type === 'payout_refused' ? 'Refused by the wallet' : ref.type === 'payout_unconfirmed' ? 'Needs a check' : 'Failed'}</span><div class="meta">${esc(ref.error)}</div>`
       : '<span class="chip warn">Not paid yet</span>';
     return `<tr><td>${esc(label(p.payee))}</td><td class="num">${fmt(p.sats)}</td><td>${cell}</td></tr>`;
   }).join('');

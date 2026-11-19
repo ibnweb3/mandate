@@ -40,3 +40,16 @@ export function makeResolver(wallets) {
     return inv.paymentRequest;
   };
 }
+
+// Did this payee's wallet receive the payment for this invoice? Returns the receipt (preimage) or null.
+// Only wallets we can query (the demo wallets) can answer; a Lightning address cannot be asked.
+export function makeChecker(wallets) {
+  return async (payee, paymentHash) => {
+    const d = payee.dest;
+    if (d.type !== 'demo_wallet') return null;
+    const c = wallets.demo[d.value];
+    if (!c) return null;
+    const tx = await c.lookupInvoice({ payment_hash: paymentHash });
+    return tx?.settled_at || tx?.state === 'settled' ? (tx.preimage ?? null) : null;
+  };
+}

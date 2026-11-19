@@ -7,7 +7,7 @@ import { extname, join, normalize } from 'node:path';
 import { Store } from './store.mjs';
 import { SignedLog } from './log.mjs';
 import { Engine } from './engine.mjs';
-import { decode, loadWallets, makeResolver } from './wallets.mjs';
+import { decode, loadWallets, makeChecker, makeResolver } from './wallets.mjs';
 import { propose } from './parser.mjs';
 import { describeRule } from './rule.mjs';
 
@@ -18,7 +18,7 @@ const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; cha
 const wallets = loadWallets();
 const store = new Store('data/state.json');
 const log = new SignedLog({ store, keyFile: 'data/nostr.key', publish: process.env.NO_PUBLISH !== '1' && !process.argv.includes('--no-publish') });
-const engine = new Engine({ store, log, listener: wallets.listener, payer: wallets.payer, resolver: makeResolver(wallets), decode });
+const engine = new Engine({ store, log, listener: wallets.listener, payer: wallets.payer, resolver: makeResolver(wallets), decode, check: makeChecker(wallets) });
 const llm = process.env.GROQ_API_KEY ? { apiKey: process.env.GROQ_API_KEY } : null;
 const destinations = Object.fromEntries(wallets.demoHandles.filter((h) => h !== 'buyer').map((h) => [h, { type: 'demo_wallet', value: h }]));
 
@@ -127,6 +127,7 @@ let unsub = null;
 async function listen() {
   unsub = await wallets.listener.subscribeNotifications((n) => { engine.handlePayment(n).then(() => { exportSnapshot(); refreshWallet(); }); }, ['payment_received']);
   await engine.catchUp();
+  await engine.resumeUnfinished();
   await log.republishPending();
   exportSnapshot();
 }

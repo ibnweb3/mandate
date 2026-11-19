@@ -39,7 +39,7 @@ Needs Node 22+ and an Alby Hub on signet (see `scripts/setup-wallets.mjs`).
 npm install
 npm run setup       # mints the listener, budget-capped payer and demo wallets into data/wallets.json (git-ignored)
 npm start           # owner console at http://localhost:8787, public proof page at /proof/
-npm test            # 27 tests: rule maths, engine, parser, verifier, tamper detection
+npm test            # 31 tests: rule maths, engine, crash and resume, parser, verifier, tamper detection
 ```
 
 `npm run dev` does the same without publishing to Nostr relays.

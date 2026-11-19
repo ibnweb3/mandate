@@ -17,6 +17,8 @@
     #fallback { position: fixed; inset: 0; padding: 18px 20px; background: var(--bg); z-index: 5; overflow: auto; }
     #fallback > div { max-width: 62ch; }
     #fallback[hidden] { display: none; }
+    #connecting { position: fixed; inset: 0; background: var(--bg); z-index: 4; }
+    #connecting[hidden] { display: none; }
     h1 { font: 500 15px/1.5 inherit; font-size: 15px; margin: 0 0 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--accent); }
     a { color: var(--accent); text-underline-offset: 3px; }
     code { font-family: inherit; color: var(--muted); }
@@ -24,6 +26,7 @@
   </style>
 </head>
 <body>
+  <div id="connecting"><p style="padding:18px 20px;margin:0;color:var(--muted)">Connecting to the owner console on this computer…</p></div>
   <div id="fallback" hidden><div>
     <h1>Owner console</h1>
     <p>The console runs next to the wallet, on the owner's own computer, so it can't be reached from here. That keeps the wallet connection off the internet.</p>
@@ -34,12 +37,12 @@
     // Try the engine on this computer. It tells us (postMessage) when its page has loaded; if nothing answers, explain why.
     const LOCAL = 'http://localhost:8787/embed/';
     let ready = false;
-    addEventListener('message', (e) => { if (e.origin === 'http://localhost:8787' && e.data && e.data.mandate === 'console-ready') { ready = true; document.getElementById('fallback').hidden = true; } });
+    addEventListener('message', (e) => { if (e.origin === 'http://localhost:8787' && e.data && e.data.mandate === 'console-ready') { ready = true; document.getElementById('fallback').hidden = true; document.getElementById('connecting').hidden = true; } });
     const f = document.createElement('iframe');
     f.title = 'Mandate owner console';
     f.src = LOCAL;
     document.body.appendChild(f);
-    setTimeout(() => { if (!ready) document.getElementById('fallback').hidden = false; }, 6000);
+    setTimeout(() => { if (!ready) { document.getElementById('connecting').hidden = true; document.getElementById('fallback').hidden = false; } }, 6000);
   </script>
 </body>
 </html>

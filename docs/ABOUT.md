@@ -35,11 +35,11 @@ Take any one away and Mandate becomes a spreadsheet with a promise.
 
 ## How we built it
 
-- **Rule engine.** The rule schema and the split arithmetic are pure functions in one file, shared by the engine and the browser, so the proof page redoes the exact same maths. Amounts are whole sats. For a sale $S$ shared by weights $w_i$ from a pool $P$, each payee gets $\lfloor P\,w_i / W \rfloor$ and the leftover sats go to the largest remainders, so that always
+- **Rule engine.** The rule schema and the split arithmetic are pure functions in one file, shared by the engine and the browser, so the proof page redoes the exact same maths. Amounts are whole sats. For a sale \\( S \\) shared by weights \\( w_i \\) from a pool \\( P \\), each payee gets \\( \lfloor P\,w_i / W \rfloor \\) and the leftover sats go to the largest remainders, so that always
 
   $$\sum_i p_i + k = S$$
 
-  where $p_i$ are the payouts and $k$ is what the owner keeps. We property-tested this over hundreds of random sales.
+  where \\( p_i \\) are the payouts and \\( k \\) is what the owner keeps. We property-tested this over hundreds of random sales.
 - **Wallet.** Alby Hub (LDK, on the signet test network) with two Nostr Wallet Connect connections: a *listener* that can make invoices and hear payments but cannot spend, and a *payer* that can only pay, with a budget the wallet enforces.
 - **Safety rules in the engine.** The plan is written to the signed log **before** any sat moves. Sales are deduplicated by payment hash, because notifications can replay. The engine decodes every payee invoice and refuses one whose amount differs from what the rule computed.
 - **Proof.** `nostr-tools` signs and publishes. One verifier file runs in Node (tests) and in the browser (proof page). It trusts nothing the engine says.

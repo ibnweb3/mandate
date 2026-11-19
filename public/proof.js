@@ -3,7 +3,7 @@ import { verifyEvent, npubEncode } from './lib/nostr.js';
 import { verifyLog } from './lib/verify.mjs';
 import { describeRule } from './lib/rule.mjs';
 
-const RELAYS = ['wss://relay.damus.io', 'wss://nos.lol', 'wss://relay.primal.net'];
+const RELAYS = ['wss://nos.lol', 'wss://relay.primal.net', 'wss://relay.damus.io'];
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const fmt = (n) => Number(n).toLocaleString('en');
@@ -50,11 +50,19 @@ async function load() {
     for (const e of snap.events) all.set(e.id, e);
     sources.push(`this site's copy: ${snap.events.length}`);
     events = [...all.values()];
-    await render(); // show this site's copy at once; the relays refine it below
-    $('sources').textContent = 'Read from this site\'s copy. Checking the public relays too…';
+    if (events.length) {
+      await render(); // show this site's copy at once; the relays refine it below
+      $('sources').textContent = 'Read from this site\'s copy. Checking the public relays too…';
+    }
   }
-  const results = await Promise.all(RELAYS.map((u) => fetchRelay(u, pubkey)));
-  results.forEach((r, i) => { for (const e of r) all.set(e.id, e); sources.push(`${RELAYS[i].replace('wss://', '')}: ${r.length}`); });
+  // Each relay updates the page as soon as it answers, so nobody waits for the slowest one.
+  await Promise.all(RELAYS.map(async (u) => {
+    const r = await fetchRelay(u, pubkey, 5000);
+    for (const e of r) all.set(e.id, e);
+    sources.push(`${u.replace('wss://', '')}: ${r.length}`);
+    events = [...all.values()];
+    if (!cheated && r.length) await render();
+  }));
   events = [...all.values()];
   if (!cheated) await render();
 }
